@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kabaddi Scorer BD — Live Kabaddi Scoreboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <h1 id="app-title">🏆 Kabaddi Scorer BD</h1>
+  <p class="tagline" data-i18n="tagline">Live kabaddi scoreboard — Bangladesh's national game</p>
+  <button id="lang-toggle" type="button" aria-label="Toggle language">বাংলা</button>
+</header>
+
+<main>
+  <!-- ============ SETUP ============ -->
+  <section id="setup-section" class="card">
+    <h2 data-i18n="setupTitle">Match Setup</h2>
+    <div class="form-row">
+      <label>
+        <span data-i18n="teamA">Team A name</span>
+        <input id="input-team-a" type="text" maxlength="30" placeholder="Team A">
+      </label>
+      <label>
+        <span data-i18n="teamB">Team B name</span>
+        <input id="input-team-b" type="text" maxlength="30" placeholder="Team B">
+      </label>
+      <label>
+        <span data-i18n="halfLength">Half length</span>
+        <select id="input-half">
+          <option value="20" selected>20 min</option>
+          <option value="15">15 min</option>
+          <option value="10">10 min</option>
+          <option value="5">5 min</option>
+        </select>
+      </label>
+    </div>
+    <p id="setup-error" class="error" role="alert" hidden></p>
+    <button id="btn-start-match" type="button" class="primary" data-i18n="startMatch">Start Match</button>
+    <p class="hint" data-i18n="setupHint">Leave a name blank to use the default (Team A / Team B).</p>
+  </section>
+
+  <!-- ============ LIVE SCOREBOARD ============ -->
+  <section id="match-section" class="card" hidden>
+    <div class="phase-row">
+      <span id="phase-badge" class="phase-badge">1st Half</span>
+      <span id="clock" class="clock">00:00</span>
+    </div>
+
+    <div class="scoreboard">
+      <div class="team-panel">
+        <h2 id="name-a" class="team-name">Team A</h2>
+        <div id="score-a" class="score">0</div>
+        <div id="counts-a" class="counts"></div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="team-panel">
+        <h2 id="name-b" class="team-name">Team B</h2>
+        <div id="score-b" class="score">0</div>
+        <div id="counts-b" class="counts"></div>
+      </div>
+    </div>
+
+    <div class="clock-controls">
+      <button id="btn-clock-toggle" type="button" data-i18n="startClock">Start Clock</button>
+      <button id="btn-clock-reset" type="button" data-i18n="resetClock">Reset Clock</button>
+      <button id="btn-end-half" type="button" data-i18n="endHalf">End Half</button>
+      <button id="btn-start-2nd" type="button" hidden data-i18n="start2nd">Start 2nd Half</button>
+      <button id="btn-new-match" type="button" class="danger-outline" data-i18n="newMatch">New Match</button>
+    </div>
+
+    <p id="match-note" class="hint" hidden></p>
+
+    <div class="scoring-grid">
+      <div class="scoring-col">
+        <h3 id="scoring-title-a">Team A</h3>
+        <div class="btn-row" data-team="A"></div>
+      </div>
+      <div class="scoring-col">
+        <h3 id="scoring-title-b">Team B</h3>
+        <div class="btn-row" data-team="B"></div>
+      </div>
+    </div>
+
+    <div class="log-block">
+      <div class="log-head">
+        <h3 data-i18n="eventLog">Event Log</h3>
+        <button id="btn-undo" type="button" data-i18n="undo">↩ Undo last event</button>
+      </div>
+      <p id="log-empty" class="hint" data-i18n="noEvents">No events yet.</p>
+      <ol id="event-log" class="event-log"></ol>
+    </div>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="history-section" class="card">
+    <h2 data-i18n="historyTitle">Finished Matches</h2>
+    <p id="history-empty" class="hint" data-i18n="noHistory">No finished matches yet. Finish a match and it will appear here.</p>
+    <div class="table-wrap">
+      <table id="history-table" hidden>
+        <thead>
+          <tr>
+            <th data-i18n="thDate">Date</th>
+            <th data-i18n="thMatch">Match</th>
+            <th data-i18n="thScore">Score</th>
+            <th data-i18n="thResult">Result</th>
+            <th data-i18n="thHalf">Half</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+    <div class="history-actions">
+      <button id="btn-export" type="button" data-i18n="exportJson">Export JSON</button>
+      <label class="file-label">
+        <span data-i18n="importJson">Import JSON</span>
+        <input id="input-import" type="file" accept=".json,application/json" hidden>
+      </label>
+      <button id="btn-erase" type="button" class="danger" data-i18n="eraseAll">Erase All History</button>
+    </div>
+    <p id="history-msg" class="hint" role="status"></p>
+    <div id="erase-box" hidden>
+      <p data-i18n="eraseConfirm">Type DELETE to erase all finished-match history. This cannot be undone.</p>
+      <input id="input-erase-confirm" type="text" placeholder="DELETE" autocomplete="off">
+      <button id="btn-erase-confirm" type="button" class="danger" disabled data-i18n="confirmErase">Erase Everything</button>
+      <button id="btn-erase-cancel" type="button" data-i18n="cancel">Cancel</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <h3 data-i18n="rulesTitle">Scoring rules (simplified standard kabaddi)</h3>
+  <ul>
+    <li data-i18n="rule1">Raid point: +1 — raider touches an opponent or crosses the bonus line safely.</li>
+    <li data-i18n="rule2">Bonus point: +1 — raider crosses the bonus line with a foot in the air.</li>
+    <li data-i18n="rule3">Tackle point: +1 — defenders stop the raider.</li>
+    <li data-i18n="rule4">Super tackle: +2 — a successful tackle when 3 or fewer defenders are on court.</li>
+    <li data-i18n="rule5">All-out: +2 — awarded to the team that puts all opponents out.</li>
+  </ul>
+  <p data-i18n="rulesNote">This is a casual scorekeeper using simplified rules. It is NOT tournament-certified and carries no live match data.</p>
+</footer>
+
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
